@@ -1,0 +1,7 @@
+DATABASE_URL="postgres://username:password@host:port/db?sslmode=require"
+
+AUTH_SECRET="132a5s64d65asdasvvsadfdasfdsafsdafsdaf"
+
+# Used to seed the first admin account (prisma/seed.ts). Change after first login.
+SEED_ADMIN_USERNAME="admin"
+SEED_ADMIN_PASSWORD="123"
