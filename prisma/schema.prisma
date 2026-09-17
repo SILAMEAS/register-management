@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["people_management"]
+}
+
+enum Role {
+  ADMIN
+  USER
+
+  @@schema("people_management")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+
+  records PersonRecord[]
+
+  @@map("users")
+  @@schema("people_management")
+}
+
+/// A registered person record (e.g. police/residence registration entry).
+model PersonRecord {
+  id           String   @id @default(cuid())
+  cardId       String   @unique @map("card_id")
+  name         String
+  address      String
+  dob          DateTime
+  registeredAt DateTime @default(now()) @map("registered_at")
+
+  createdById String @map("created_by_id")
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([createdById, createdAt])
+  @@index([createdAt])
+  @@map("person_records")
+  @@schema("people_management")
+}
