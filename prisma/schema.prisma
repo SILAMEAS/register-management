@@ -37,6 +37,8 @@ model PersonRecord {
   cardId       String   @unique @map("card_id")
   name         String
   address      String
+  district     String?
+  province     String?
   dob          DateTime
   registeredAt DateTime @default(now()) @map("registered_at")
 

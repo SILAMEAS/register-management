@@ -13,12 +13,15 @@ import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { DeleteRecordButton } from "./delete-record-button";
 import { RecordsPagination } from "./records-pagination";
+import type { RecordFiltersValues } from "./records-filters";
 
 type Record = {
   id: string;
   cardId: string;
   name: string;
   address: string;
+  district: string | null;
+  province: string | null;
   dob: Date;
   registeredAt: Date;
   createdBy: { username: string };
@@ -35,6 +38,7 @@ export async function RecordsTable({
   pageSize,
   total,
   totalPages,
+  filters,
 }: {
   records: Record[];
   showCreatedBy: boolean;
@@ -42,18 +46,20 @@ export async function RecordsTable({
   pageSize: number;
   total: number;
   totalPages: number;
+  filters: RecordFiltersValues;
 }) {
   const t = await getTranslations("Records");
+  const hasActiveFilters = Object.values(filters).some(Boolean);
 
   if (records.length === 0) {
     return (
       <p className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
-        {t("noRecordsYet")}
+        {hasActiveFilters ? t("noRecordsMatch") : t("noRecordsYet")}
       </p>
     );
   }
 
-  const columnCount = showCreatedBy ? 7 : 6;
+  const columnCount = showCreatedBy ? 9 : 8;
 
   return (
     <div className="overflow-hidden rounded-md border">
@@ -63,6 +69,8 @@ export async function RecordsTable({
             <TableHead>{t("cardId")}</TableHead>
             <TableHead>{t("name")}</TableHead>
             <TableHead>{t("address")}</TableHead>
+            <TableHead>{t("district")}</TableHead>
+            <TableHead>{t("province")}</TableHead>
             <TableHead>{t("dob")}</TableHead>
             <TableHead>{t("registeredAt")}</TableHead>
             {showCreatedBy && <TableHead>{t("createdBy")}</TableHead>}
@@ -77,6 +85,8 @@ export async function RecordsTable({
               <TableCell className="max-w-xs truncate">
                 {record.address}
               </TableCell>
+              <TableCell>{record.district ?? ""}</TableCell>
+              <TableCell>{record.province ?? ""}</TableCell>
               <TableCell>{formatDate(record.dob)}</TableCell>
               <TableCell>{formatDate(record.registeredAt)}</TableCell>
               {showCreatedBy && (
@@ -102,6 +112,7 @@ export async function RecordsTable({
                 pageSize={pageSize}
                 total={total}
                 totalPages={totalPages}
+                filters={filters}
               />
             </TableCell>
           </TableRow>

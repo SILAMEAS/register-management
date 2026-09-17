@@ -37,6 +37,8 @@ export default async function EditRecordPage({
           cardId: record.cardId,
           name: record.name,
           address: record.address,
+          district: record.district ?? undefined,
+          province: record.province ?? undefined,
           dob: toDateInputValue(record.dob),
           registeredAt: toDateInputValue(record.registeredAt),
         }}

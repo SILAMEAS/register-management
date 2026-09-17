@@ -8,17 +8,35 @@ import { requireUser } from "@/lib/dal";
 import { redirect } from "@/i18n/navigation";
 import { buildPersonRecordSchema } from "@/lib/validations";
 import { toCsv } from "@/lib/csv";
+import { NONE_VALUE } from "@/lib/locations";
 
 export type RecordFormState = {
-  errors?: Partial<Record<"cardId" | "name" | "address" | "dob" | "registeredAt", string[]>>;
+  errors?: Partial<
+    Record<
+      | "cardId"
+      | "name"
+      | "address"
+      | "district"
+      | "province"
+      | "dob"
+      | "registeredAt",
+      string[]
+    >
+  >;
   message?: string;
 } | undefined;
+
+function normalizeSelect(value: FormDataEntryValue | null) {
+  return value && value !== NONE_VALUE ? value : undefined;
+}
 
 function parseForm(formData: FormData, t: (key: string) => string) {
   return buildPersonRecordSchema(t).safeParse({
     cardId: formData.get("cardId"),
     name: formData.get("name"),
     address: formData.get("address"),
+    district: normalizeSelect(formData.get("district")),
+    province: normalizeSelect(formData.get("province")),
     dob: formData.get("dob"),
     registeredAt: formData.get("registeredAt"),
   });
@@ -36,7 +54,8 @@ export async function createRecord(
     return { errors: parsed.error.flatten().fieldErrors };
   }
 
-  const { cardId, name, address, dob, registeredAt } = parsed.data;
+  const { cardId, name, address, district, province, dob, registeredAt } =
+    parsed.data;
 
   try {
     await prisma.personRecord.create({
@@ -44,6 +63,8 @@ export async function createRecord(
         cardId,
         name,
         address,
+        district: district ?? null,
+        province: province ?? null,
         dob: new Date(dob),
         registeredAt: new Date(registeredAt),
         createdById: user.id,
@@ -79,7 +100,8 @@ export async function updateRecord(
     return { message: t("notAllowedToEdit") };
   }
 
-  const { cardId, name, address, dob, registeredAt } = parsed.data;
+  const { cardId, name, address, district, province, dob, registeredAt } =
+    parsed.data;
 
   try {
     await prisma.personRecord.update({
@@ -88,6 +110,8 @@ export async function updateRecord(
         cardId,
         name,
         address,
+        district: district ?? null,
+        province: province ?? null,
         dob: new Date(dob),
         registeredAt: new Date(registeredAt),
       },
@@ -122,6 +146,8 @@ export async function exportRecords(deleteAfterExport: boolean) {
     t("cardId"),
     t("name"),
     t("address"),
+    t("district"),
+    t("province"),
     t("dob"),
     t("registeredAt"),
     ...(isAdmin ? [t("createdBy")] : []),
@@ -131,6 +157,8 @@ export async function exportRecords(deleteAfterExport: boolean) {
     record.cardId,
     record.name,
     record.address,
+    record.district ?? "",
+    record.province ?? "",
     formatDate(record.dob),
     formatDate(record.registeredAt),
     ...(isAdmin ? [record.createdBy.username] : []),

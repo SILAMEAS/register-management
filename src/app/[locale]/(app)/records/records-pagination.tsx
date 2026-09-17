@@ -3,15 +3,22 @@ import { cn } from "cn";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import type { RecordFiltersValues } from "./records-filters";
 
 export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
 export const DEFAULT_PAGE_SIZE = 20;
 
-function hrefFor(page: number, pageSize: number) {
-  const params = new URLSearchParams({
-    page: String(page),
-    pageSize: String(pageSize),
-  });
+function hrefFor(
+  page: number,
+  pageSize: number,
+  filters: RecordFiltersValues
+) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value) params.set(key, value);
+  }
+  params.set("page", String(page));
+  params.set("pageSize", String(pageSize));
   return `/records?${params.toString()}`;
 }
 
@@ -20,11 +27,13 @@ export async function RecordsPagination({
   pageSize,
   total,
   totalPages,
+  filters,
 }: {
   page: number;
   pageSize: number;
   total: number;
   totalPages: number;
+  filters: RecordFiltersValues;
 }) {
   const t = await getTranslations("Pagination");
 
@@ -42,7 +51,7 @@ export async function RecordsPagination({
         {PAGE_SIZE_OPTIONS.map((size) => (
           <Link
             key={size}
-            href={hrefFor(1, size)}
+            href={hrefFor(1, size, filters)}
             className={cn(
               "rounded px-1.5 py-0.5",
               size === pageSize
@@ -57,7 +66,7 @@ export async function RecordsPagination({
 
       <div className="flex items-center gap-2">
         <Link
-          href={hrefFor(Math.max(1, page - 1), pageSize)}
+          href={hrefFor(Math.max(1, page - 1), pageSize, filters)}
           aria-disabled={page <= 1}
           className={cn(
             buttonVariants({ variant: "outline", size: "sm" }),
@@ -68,7 +77,7 @@ export async function RecordsPagination({
         </Link>
         <span>{t("pageOf", { page, totalPages })}</span>
         <Link
-          href={hrefFor(Math.min(totalPages, page + 1), pageSize)}
+          href={hrefFor(Math.min(totalPages, page + 1), pageSize, filters)}
           aria-disabled={page >= totalPages}
           className={cn(
             buttonVariants({ variant: "outline", size: "sm" }),

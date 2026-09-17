@@ -6,12 +6,22 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DISTRICTS, NONE_VALUE, PROVINCES } from "@/lib/locations";
 import type { RecordFormState } from "./actions";
 
 type RecordFormValues = {
   cardId: string;
   name: string;
   address: string;
+  district?: string;
+  province?: string;
   dob: string;
   registeredAt: string;
 };
@@ -70,6 +80,54 @@ export function RecordForm({
         {state?.errors?.address && (
           <p className="text-sm text-destructive">
             {state.errors.address[0]}
+          </p>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="district">{t("district")}</Label>
+        <Select name="district" defaultValue={defaultValues?.district ?? NONE_VALUE}>
+          <SelectTrigger id="district" className="w-full">
+            <SelectValue>
+              {(value: string) => (value === NONE_VALUE ? t("none") : value)}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={NONE_VALUE}>{t("none")}</SelectItem>
+            {DISTRICTS.map((district) => (
+              <SelectItem key={district} value={district}>
+                {district}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {state?.errors?.district && (
+          <p className="text-sm text-destructive">
+            {state.errors.district[0]}
+          </p>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="province">{t("province")}</Label>
+        <Select name="province" defaultValue={defaultValues?.province ?? NONE_VALUE}>
+          <SelectTrigger id="province" className="w-full">
+            <SelectValue>
+              {(value: string) => (value === NONE_VALUE ? t("none") : value)}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={NONE_VALUE}>{t("none")}</SelectItem>
+            {PROVINCES.map((province) => (
+              <SelectItem key={province} value={province}>
+                {province}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {state?.errors?.province && (
+          <p className="text-sm text-destructive">
+            {state.errors.province[0]}
           </p>
         )}
       </div>

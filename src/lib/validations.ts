@@ -1,5 +1,7 @@
 import * as z from "zod";
 
+import { DISTRICTS, PROVINCES } from "./locations";
+
 type Translator = (key: string) => string;
 
 export const loginSchema = z.object({
@@ -12,6 +14,8 @@ export function buildPersonRecordSchema(t: Translator) {
     cardId: z.string().trim().min(1, t("cardIdRequired")).max(64),
     name: z.string().trim().min(1, t("nameRequired")).max(200),
     address: z.string().trim().min(1, t("addressRequired")).max(500),
+    district: z.enum(DISTRICTS, { error: t("districtInvalid") }).optional(),
+    province: z.enum(PROVINCES, { error: t("provinceInvalid") }).optional(),
     dob: z.iso.date(t("dobInvalid")),
     registeredAt: z.iso.date(t("registeredAtInvalid")),
   });
