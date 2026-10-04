@@ -10,9 +10,10 @@ export const DISTRICTS = [
   "Por Sen Chey",
   "Sen Sok",
   "Chamkarmon",
-  "សាលាខណ្ឌច្បារអំពៅ",
-  "សាលាខណ្ឌជ្រោយចង្វារ",
-  "សាលាខណ្ឌព្រែកព្នៅ",
+  "ខណ្ឌច្បារអំពៅ",
+  "ខណ្ឌជ្រោយចង្វារ",
+  "ខណ្ឌព្រែកព្នៅ",
+  "ខណ្ឌបឹងកេងកង"
 ] as const;
 
 export const PROVINCES = [
